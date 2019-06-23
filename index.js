@@ -3,6 +3,9 @@ import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import keys from './config/keys'
 
+import './models/Mobile'
+// import MobileRoute
+
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true })
 
 const app = express()
