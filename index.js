@@ -3,6 +3,9 @@ import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import keys from './config/keys'
 
+import './models/Mobile'
+import MobileRoute from './route/mobileRoute'
+
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true })
 
 const app = express()
@@ -13,7 +16,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json())
 app.use('/api/**', bodyParser.json())
 
-// CsvRoute(app)
+MobileRoute(app)
 
 if (process.env.NODE_ENV === 'production') {
   // Express wil serve up production assets
