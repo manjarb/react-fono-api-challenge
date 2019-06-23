@@ -6,10 +6,6 @@ import { mobileList } from '../helper/mobiles'
 fonoApi.token = keys.fonoKey;
 const Mobile = mongoose.model('mobiles')
 
-function saveMobileData(queryString, data) {
-    console.log(data, ' :data');
-}
-
 export default (app) => {
     app.post('/api/mobile/dummy', (req, res) => {
         mobileList.forEach(m => {
@@ -24,7 +20,7 @@ export default (app) => {
                     bands3g: data[0]._3g_bands,
                     bands4g: data[0]._4g_bands,
                     bookedBy: null,
-                    bookedAt: Date.now()
+                    bookedAt: null
                 })
         
                 try {
@@ -48,18 +44,41 @@ export default (app) => {
         }
     })
 
-    app.patch('/api/booking/:id', async (req, res) => {
+    app.patch('/api/booking/:id/book', async (req, res) => {
         const bookingObject = req.body
         const booking = {
           ...bookingObject,
+          availability: false,
           bookedAt: Date.now(),
+          bookedBy: bookingObject.user.id,
         }
     
         try {
           await Mobile.findByIdAndUpdate(req.params.id, {
             $set: booking
           })
-          res.json({ result: 'done' })
+          const result = await Mobile.find().sort({ created: 'desc' })
+          res.json({ result })
+        } catch (err) {
+          res.status(422).json(err)
+        }
+    })
+
+    app.patch('/api/booking/:id/return', async (req, res) => {
+        const bookingObject = req.body
+        const booking = {
+          ...bookingObject,
+          availability: true,
+          bookedAt: null,
+          bookedBy: null,
+        }
+    
+        try {
+          await Mobile.findByIdAndUpdate(req.params.id, {
+            $set: booking
+          })
+          const result = await Mobile.find().sort({ created: 'desc' })
+          res.json({ result })
         } catch (err) {
           res.status(422).json(err)
         }
